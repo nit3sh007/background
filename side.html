@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gleamp - Premium Social Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        /* Logo Section */
+        .logo-container {
+            padding: 0 24px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ffffff, #e0e0e0);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            color: #0a0a0a;
+            font-weight: 700;
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.25);
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -1px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Menu Items */
+        .menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0 12px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 24px;
+            position: relative;
+            font-weight: 500;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .menu-item.active {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .menu-item i {
+            font-size: 26px;
+            width: 30px;
+            margin-right: 20px;
+            text-align: left;
+        }
+
+        .menu-item-text {
+            transition: opacity 0.3s ease;
+        }
+
+        .notification-badge {
+            background: linear-gradient(135deg, #4a90e2, #5ca0f2);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 16px;
+            margin-left: auto;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.4);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            padding: 16px 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            padding: 16px 16px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .profile:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-pic {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 16px;
+            position: relative;
+            box-shadow: 0 6px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-pic::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #2ecc71;
+            border-radius: 50%;
+            border: 3px solid #0a0a0a;
+        }
+
+        .profile-info {
+            flex: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-name {
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .profile-handle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 15px;
+        }
+
+        .settings-icon {
+            color: rgba(255, 255, 255, 0.7);
+            margin-left: 12px;
+            font-size: 18px;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Desktop Large (1200px and up) */
+        @media (min-width: 1200px) {
+            .sidebar {
+                width: 300px;
+                padding: 24px 0;
+            }
+            
+            .logo-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+                border-radius: 18px;
+            }
+            
+            .logo-text {
+                font-size: 36px;
+            }
+            
+            .menu-item {
+                font-size: 22px;
+                padding: 18px 24px;
+            }
+            
+            .menu-item i {
+                font-size: 28px;
+                margin-right: 24px;
+            }
+        }
+
+        /* Tablet (768px to 1199px) */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .sidebar {
+                width: 88px;
+                padding: 20px 0;
+            }
+            
+            .logo-container {
+                padding: 0 20px 24px;
+                border-bottom: none;
+                margin-bottom: 16px;
+            }
+            
+            .logo-text {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .logo-icon {
+                margin: 0;
+                width: 48px;
+                height: 48px;
+                font-size: 24px;
+            }
+            
+            .menu {
+                padding: 0 12px;
+                gap: 8px;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 20px 16px;
+                border-radius: 20px;
+                position: relative;
+            }
+            
+            .menu-item i {
+                margin: 0;
+                font-size: 26px;
+            }
+            
+            .menu-item-text {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .notification-badge {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                padding: 2px 6px;
+                font-size: 10px;
+                min-width: 16px;
+                height: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .profile-section {
+                padding: 16px 12px;
+            }
+            
+            .profile {
+                justify-content: center;
+                padding: 16px 12px;
+            }
+            
+            .profile-info,
+            .settings-icon {
+                opacity: 0;
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .profile-pic {
+                margin: 0;
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        /* Mobile (767px and down) */
+        @media (max-width: 767px) {
+            .sidebar {
+                width: 100%;
+                height: 70px;
+                bottom: 0;
+                top: auto;
+                flex-direction: row;
+                padding: 0;
+                background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+                border-right: none;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(30px);
+            }
+            
+            .logo-container {
+                display: none;
+            }
+            
+            .menu {
+                flex-direction: row;
+                flex: 1;
+                gap: 0;
+                padding: 0;
+                justify-content: space-around;
+                align-items: center;
+            }
+            
+            .menu-item {
+                flex-direction: column;
+                padding: 12px 8px;
+                border-radius: 16px;
+                font-size: 10px;
+                font-weight: 600;
+                text-align: center;
+                min-width: 60px;
+                position: relative;
+                justify-content: center;
+            }
+            
+            .menu-item i {
+                font-size: 20px;
+                margin: 0 0 4px 0;
+                width: auto;
+            }
+            
+            .menu-item-text {
+                font-size: 11px;
+                margin-top: 2px;
+                opacity: 1;
+            }
+            
+            .notification-badge {
+                position: absolute;
+                top: 4px;
+                right: 12px;
+                padding: 1px 4px;
+                font-size: 8px;
+                min-width: 12px;
+                height: 12px;
+                border-radius: 8px;
+            }
+            
+            .profile-section {
+                display: none;
+            }
+            
+            /* Hide some menu items on mobile for better spacing */
+            .menu-item:nth-child(6) { /* Settings */
+                display: none;
+            }
+        }
+
+        /* Extra small mobile (480px and down) */
+        @media (max-width: 480px) {
+            .menu-item {
+                min-width: 50px;
+                padding: 10px 6px;
+            }
+            
+            .menu-item i {
+                font-size: 18px;
+            }
+            
+            .menu-item-text {
+                font-size: 10px;
+            }
+        }
+
+        /* Hover effects for desktop and tablet */
+        @media (min-width: 768px) {
+            .menu-item:hover {
+                transform: translateX(4px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <!-- Logo Section -->
+        <div class="logo-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">G</div>
+                <div class="logo-text">Gleamp</div>
+            </a>
+        </div>
+        
+        <!-- Menu Items -->
+        <div class="menu">
+            <a href="#" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span class="menu-item-text">Home</span>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-search"></i>
+                <span class="menu-item-text">Search</span>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-envelope"></i>
+                <span class="menu-item-text">Messages</span>
+                <span class="notification-badge">2</span>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-user"></i>
+                <span class="menu-item-text">Profile</span>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-bell"></i>
+                <span class="menu-item-text">Notifications</span>
+                <span class="notification-badge">5</span>
+            </a>
+            
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span class="menu-item-text">Settings</span>
+            </a>
+        </div>
+        
+        <!-- Profile Section -->
+        <div class="profile-section">
+            <div class="profile">
+                <div class="profile-pic">JD</div>
+                <div class="profile-info">
+                    <div class="profile-name">John Doe</div>
+                    <div class="profile-handle">@johndoe</div>
+                </div>
+                <i class="fas fa-cog settings-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add active class to menu items on click
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Remove active class from all items
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                this.classList.add('active');
+                
+                // Prevent default link behavior for demo
+                e.preventDefault();
+            });
+        });
+        
+        // Logo click handler
+        const logoElement = document.querySelector('.logo');
+        if (logoElement) {
+            logoElement.addEventListener('click', function(e) {
+                // Reset active state to Home
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                document.querySelector('.menu-item').classList.add('active');
+                e.preventDefault();
+            });
+        }
+
+        // Handle window resize for better responsive behavior
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                // Force a repaint to ensure smooth transitions
+                document.body.style.display = 'none';
+                document.body.offsetHeight; // Trigger reflow
+                document.body.style.display = '';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

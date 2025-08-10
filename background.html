@@ -1,0 +1,712 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Galaxy Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        #galaxy-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            pointer-events: none;
+        }
+        .content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        .content p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 3;
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            pointer-events: all;
+        }
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .control-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="galaxy-canvas"></canvas>
+    
+    <div class="content">
+        <h1>Explore the Infinite Universe</h1>
+        <p>Every star tells a story of cosmic wonder. Join us on this stellar journey and experience the tranquility and majesty of deep space.</p>
+    </div>
+    <div class="controls">
+        <button class="control-btn active" id="toggleStars">Stars</button>
+        <button class="control-btn" id="toggleNebula">Nebulae</button>
+        <button class="control-btn" id="toggleShooting">Shooting Stars</button>
+    </div>
+    <script>
+        class GalaxyBackground {
+            constructor() {
+                this.canvas = document.getElementById('galaxy-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.stars = [];
+                this.shootingStars = [];
+                this.nebulae = [];
+                
+                this.effects = {
+                    stars: true,
+                    nebula: false,
+                    shooting: false
+                };
+                // Shooting star timing control
+                this.lastShootingStarTime = 0;
+                // Set initial random interval between 0 and 2 minutes (120,000 milliseconds)
+                this.shootingStarInterval = Math.random() * 120000;
+                this.currentShootingStar = null;
+                this.init();
+                this.createStars();
+                this.createNebulae();
+                this.animate();
+                this.setupControls();
+            }
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            createStars() {
+                // Significantly reduced star count for a cleaner look
+                const starCount = 150;
+                
+                for (let i = 0; i < starCount; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 0.8 + 0.2, // Very tiny stars (0.2-1.0 pixels)
+                        brightness: Math.random() * 0.8 + 0.2,
+                        twinkleSpeed: Math.random() * 0.05 + 0.02,
+                        twinklePhase: Math.random() * Math.PI * 2,
+                        color: this.getStarColor(),
+                        speed: Math.random() * 0.3 + 0.1 // Movement speed to the right
+                    });
+                }
+            }
+            getStarColor() {
+                const colors = [
+                    '#FFFFFF', // White
+                    '#FFE9C4', // Light yellow
+                    '#D4E4FF', // Light blue
+                    '#FFD4D4', // Light red
+                    '#E4D4FF'  // Light purple
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            createNebulae() {
+                const nebulaCount = 3;
+                
+                for (let i = 0; i < nebulaCount; i++) {
+                    this.nebulae.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        radius: Math.random() * 200 + 100,
+                        color: this.getNebulaColor(),
+                        opacity: Math.random() * 0.1 + 0.05,
+                        pulseSpeed: Math.random() * 0.01 + 0.005,
+                        pulsePhase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+            getNebulaColor() {
+                const colors = [
+                    'rgba(138, 43, 226, 0.3)',  // Purple
+                    'rgba(30, 144, 255, 0.3)',  // Blue
+                    'rgba(255, 20, 147, 0.3)',  // Pink
+                    'rgba(0, 255, 127, 0.3)'    // Green
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            createShootingStar() {
+                const currentTime = Date.now();
+                
+                // Check if enough time has passed since the last shooting star
+                if (currentTime - this.lastShootingStarTime < this.shootingStarInterval) {
+                    return;
+                }
+                
+                // Only create if there's no current shooting star
+                if (!this.currentShootingStar) {
+                    // Start from above the screen with random x position
+                    const startX = Math.random() * this.canvas.width;
+                    const startY = -50; // Start above the visible area
+                    
+                    // Angle between 65-85 degrees for diagonal descent (not straight down)
+                    const angle = Math.random() * 20 + 65;
+                    const radians = angle * Math.PI / 180;
+                    
+                    this.currentShootingStar = {
+                        x: startX,
+                        y: startY,
+                        angle: angle,
+                        speed: Math.random() * 3 + 2, // Slightly faster for sharper movement
+                        length: Math.random() * 100 + 80, // Longer trail
+                        opacity: 1,
+                        headSize: Math.random() * 1 + 1 // Larger head for sharper appearance
+                    };
+                    
+                    this.lastShootingStarTime = currentTime;
+                    // Set a new random interval for the next shooting star (between 0 and 10 seconds)
+                    this.shootingStarInterval = Math.random() * 10000;
+                }
+            }
+            drawStars() {
+                if (!this.effects.stars) return;
+                this.stars.forEach(star => {
+                    // Update twinkle effect (independent of movement)
+                    star.twinklePhase += star.twinkleSpeed;
+                    const twinkle = Math.sin(star.twinklePhase) * 0.5 + 0.5;
+                    const currentBrightness = star.brightness * twinkle;
+                    // Move star to the right
+                    star.x += star.speed;
+                    // When star moves off screen to the right, reset it to the left
+                    if (star.x > this.canvas.width + 10) {
+                        star.x = -10; // Start just off the left edge
+                        star.y = Math.random() * this.canvas.height; // New random Y position
+                    }
+                    // Draw star
+                    this.ctx.save();
+                    this.ctx.globalAlpha = currentBrightness;
+                    this.ctx.fillStyle = star.color;
+                    this.ctx.shadowBlur = star.size * 2; // Subtle glow
+                    this.ctx.shadowColor = star.color;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+            }
+            drawNebulae() {
+                if (!this.effects.nebula) return;
+                this.nebulae.forEach(nebula => {
+                    // Update pulse effect
+                    nebula.pulsePhase += nebula.pulseSpeed;
+                    const pulse = Math.sin(nebula.pulsePhase) * 0.3 + 0.7;
+                    
+                    this.ctx.save();
+                    this.ctx.globalAlpha = nebula.opacity * pulse;
+                    
+                    // Create radial gradient
+                    const gradient = this.ctx.createRadialGradient(
+                        nebula.x, nebula.y, 0,
+                        nebula.x, nebula.y, nebula.radius
+                    );
+                    gradient.addColorStop(0, nebula.color);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    this.ctx.arc(nebula.x, nebula.y, nebula.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+            }
+            drawShootingStars() {
+                if (!this.effects.shooting) return;
+                this.createShootingStar();
+                if (this.currentShootingStar) {
+                    const shootingStar = this.currentShootingStar;
+                    
+                    // Update position
+                    const radians = shootingStar.angle * Math.PI / 180;
+                    shootingStar.x += Math.cos(radians) * shootingStar.speed;
+                    shootingStar.y += Math.sin(radians) * shootingStar.speed;
+                    
+                    // Calculate tail position
+                    const tailX = shootingStar.x - Math.cos(radians) * shootingStar.length;
+                    const tailY = shootingStar.y - Math.sin(radians) * shootingStar.length;
+                    
+                    this.ctx.save();
+                    
+                    // Create gradient for the shooting star
+                    const gradient = this.ctx.createLinearGradient(
+                        shootingStar.x, shootingStar.y,
+                        tailX, tailY
+                    );
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${shootingStar.opacity})`);
+                    gradient.addColorStop(0.5, `rgba(220, 240, 255, ${shootingStar.opacity * 0.8})`);
+                    gradient.addColorStop(1, 'rgba(180, 210, 255, 0)');
+                    
+                    // Draw the shooting star as a thick line with gradient
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.lineWidth = shootingStar.headSize;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.shadowBlur = 20; // Increased glow for sharper appearance
+                    this.ctx.shadowColor = '#FFFFFF';
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(shootingStar.x, shootingStar.y);
+                    this.ctx.lineTo(tailX, tailY);
+                    this.ctx.stroke();
+                    
+                    // Draw a bright head
+                    this.ctx.globalAlpha = shootingStar.opacity;
+                    this.ctx.fillStyle = '#FFFFFF';
+                    this.ctx.shadowBlur = 25; // Even brighter head
+                    this.ctx.shadowColor = '#FFFFFF';
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(shootingStar.x, shootingStar.y, shootingStar.headSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Add extra bright core
+                    this.ctx.globalAlpha = shootingStar.opacity * 1.2;
+                    this.ctx.fillStyle = '#FFFFFF';
+                    this.ctx.shadowBlur = 5;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(shootingStar.x, shootingStar.y, shootingStar.headSize * 0.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.restore();
+                    
+                    // Fade out effect
+                    shootingStar.opacity -= 0.006;
+                    
+                    // Check if shooting star should be removed
+                    if (shootingStar.opacity <= 0 || 
+                        shootingStar.x > this.canvas.width + 100 || 
+                        shootingStar.y > this.canvas.height + 100) {
+                        this.currentShootingStar = null;
+                    }
+                }
+            }
+            animate() {
+                // Clear canvas
+                this.ctx.fillStyle = '#000000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                // Draw all effects
+                this.drawNebulae();
+                this.drawStars();
+                this.drawShootingStars();
+                requestAnimationFrame(() => this.animate());
+            }
+            setupControls() {
+                document.getElementById('toggleStars').addEventListener('click', (e) => {
+                    this.effects.stars = !this.effects.stars;
+                    e.target.classList.toggle('active');
+                });
+                document.getElementById('toggleNebula').addEventListener('click', (e) => {
+                    this.effects.nebula = !this.effects.nebula;
+                    e.target.classList.toggle('active');
+                });
+                document.getElementById('toggleShooting').addEventListener('click', (e) => {
+                    this.effects.shooting = !this.effects.shooting;
+                    e.target.classList.toggle('active');
+                    
+                    // Reset shooting star when toggling off
+                    if (!this.effects.shooting) {
+                        this.currentShootingStar = null;
+                    }
+                });
+            }
+        }
+        // Initialize the galaxy background when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            new GalaxyBackground();
+        });
+    </script>
+</body>
+</html> 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ -->
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Galaxy Background</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        #galaxy-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            pointer-events: none;
+        }
+        .content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        .content p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 40px rgba(255, 255, 255, 0.6);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="galaxy-canvas"></canvas>
+    
+    <div class="content">
+        <h1>Explore the Infinite Universe</h1>
+        <p>Every star tells a story of cosmic wonder. Join us on this stellar journey and experience the tranquility and majesty of deep space.</p>
+    </div>
+    
+    <script>
+        class GalaxyBackground {
+            constructor() {
+                this.canvas = document.getElementById('galaxy-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.stars = [];
+                this.shootingStars = [];
+                this.nebulae = [];
+                
+                // Shooting star timing control
+                this.lastShootingStarTime = 0;
+                // Set initial random interval between 0 and 2 minutes (120,000 milliseconds)
+                this.shootingStarInterval = Math.random() * 120000;
+                this.currentShootingStar = null;
+                this.init();
+                this.createStars();
+                this.createNebulae();
+                this.animate();
+            }
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            createStars() {
+                // Significantly reduced star count for a cleaner look
+                const starCount = 150;
+                
+                for (let i = 0; i < starCount; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 0.8 + 0.2, // Very tiny stars (0.2-1.0 pixels)
+                        brightness: Math.random() * 0.8 + 0.2,
+                        twinkleSpeed: Math.random() * 0.05 + 0.02,
+                        twinklePhase: Math.random() * Math.PI * 2,
+                        color: this.getStarColor(),
+                        speed: Math.random() * 0.3 + 0.1 // Movement speed to the right
+                    });
+                }
+            }
+            getStarColor() {
+                const colors = [
+                    '#FFFFFF', // White
+                    '#FFE9C4', // Light yellow
+                    '#D4E4FF', // Light blue
+                    '#FFD4D4', // Light red
+                    '#E4D4FF'  // Light purple
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            createNebulae() {
+                const nebulaCount = 3;
+                
+                for (let i = 0; i < nebulaCount; i++) {
+                    this.nebulae.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        radius: Math.random() * 200 + 100,
+                        color: this.getNebulaColor(),
+                        opacity: Math.random() * 0.1 + 0.05,
+                        pulseSpeed: Math.random() * 0.01 + 0.005,
+                        pulsePhase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+            getNebulaColor() {
+                const colors = [
+                    'rgba(138, 43, 226, 0.3)',  // Purple
+                    'rgba(30, 144, 255, 0.3)',  // Blue
+                    'rgba(255, 20, 147, 0.3)',  // Pink
+                    'rgba(0, 255, 127, 0.3)'    // Green
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            createShootingStar() {
+                const currentTime = Date.now();
+                
+                // Check if enough time has passed since the last shooting star
+                if (currentTime - this.lastShootingStarTime < this.shootingStarInterval) {
+                    return;
+                }
+                
+                // Only create if there's no current shooting star
+                if (!this.currentShootingStar) {
+                    // Start from above the screen with random x position
+                    const startX = Math.random() * this.canvas.width;
+                    const startY = -50; // Start above the visible area
+                    
+                    // Angle between 65-85 degrees for diagonal descent (not straight down)
+                    const angle = Math.random() * 20 + 65;
+                    const radians = angle * Math.PI / 180;
+                    
+                    this.currentShootingStar = {
+                        x: startX,
+                        y: startY,
+                        angle: angle,
+                        speed: Math.random() * 3 + 2, // Slightly faster for sharper movement
+                        length: Math.random() * 100 + 80, // Longer trail
+                        opacity: 1,
+                        headSize: Math.random() * 1 + 1 // Larger head for sharper appearance
+                    };
+                    
+                    this.lastShootingStarTime = currentTime;
+                    // Set a new random interval for the next shooting star (between 0 and 2 minutes)
+                    this.shootingStarInterval = Math.random() * 120000;
+                }
+            }
+            drawStars() {
+                this.stars.forEach(star => {
+                    // Update twinkle effect (independent of movement)
+                    star.twinklePhase += star.twinkleSpeed;
+                    const twinkle = Math.sin(star.twinklePhase) * 0.5 + 0.5;
+                    const currentBrightness = star.brightness * twinkle;
+                    // Move star to the right
+                    star.x += star.speed;
+                    // When star moves off screen to the right, reset it to the left
+                    if (star.x > this.canvas.width + 10) {
+                        star.x = -10; // Start just off the left edge
+                        star.y = Math.random() * this.canvas.height; // New random Y position
+                    }
+                    // Draw star
+                    this.ctx.save();
+                    this.ctx.globalAlpha = currentBrightness;
+                    this.ctx.fillStyle = star.color;
+                    this.ctx.shadowBlur = star.size * 2; // Subtle glow
+                    this.ctx.shadowColor = star.color;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+            }
+            drawNebulae() {
+                this.nebulae.forEach(nebula => {
+                    // Update pulse effect
+                    nebula.pulsePhase += nebula.pulseSpeed;
+                    const pulse = Math.sin(nebula.pulsePhase) * 0.3 + 0.7;
+                    
+                    this.ctx.save();
+                    this.ctx.globalAlpha = nebula.opacity * pulse;
+                    
+                    // Create radial gradient
+                    const gradient = this.ctx.createRadialGradient(
+                        nebula.x, nebula.y, 0,
+                        nebula.x, nebula.y, nebula.radius
+                    );
+                    gradient.addColorStop(0, nebula.color);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.beginPath();
+                    this.ctx.arc(nebula.x, nebula.y, nebula.radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+            }
+            drawShootingStars() {
+                this.createShootingStar();
+                if (this.currentShootingStar) {
+                    const shootingStar = this.currentShootingStar;
+                    
+                    // Update position
+                    const radians = shootingStar.angle * Math.PI / 180;
+                    shootingStar.x += Math.cos(radians) * shootingStar.speed;
+                    shootingStar.y += Math.sin(radians) * shootingStar.speed;
+                    
+                    // Calculate tail position
+                    const tailX = shootingStar.x - Math.cos(radians) * shootingStar.length;
+                    const tailY = shootingStar.y - Math.sin(radians) * shootingStar.length;
+                    
+                    this.ctx.save();
+                    
+                    // Create gradient for the shooting star
+                    const gradient = this.ctx.createLinearGradient(
+                        shootingStar.x, shootingStar.y,
+                        tailX, tailY
+                    );
+                    gradient.addColorStop(0, `rgba(255, 255, 255, ${shootingStar.opacity})`);
+                    gradient.addColorStop(0.5, `rgba(220, 240, 255, ${shootingStar.opacity * 0.8})`);
+                    gradient.addColorStop(1, 'rgba(180, 210, 255, 0)');
+                    
+                    // Draw the shooting star as a thick line with gradient
+                    this.ctx.strokeStyle = gradient;
+                    this.ctx.lineWidth = shootingStar.headSize;
+                    this.ctx.lineCap = 'round';
+                    this.ctx.shadowBlur = 20; // Increased glow for sharper appearance
+                    this.ctx.shadowColor = '#FFFFFF';
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(shootingStar.x, shootingStar.y);
+                    this.ctx.lineTo(tailX, tailY);
+                    this.ctx.stroke();
+                    
+                    // Draw a bright head
+                    this.ctx.globalAlpha = shootingStar.opacity;
+                    this.ctx.fillStyle = '#FFFFFF';
+                    this.ctx.shadowBlur = 25; // Even brighter head
+                    this.ctx.shadowColor = '#FFFFFF';
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(shootingStar.x, shootingStar.y, shootingStar.headSize, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Add extra bright core
+                    this.ctx.globalAlpha = shootingStar.opacity * 1.2;
+                    this.ctx.fillStyle = '#FFFFFF';
+                    this.ctx.shadowBlur = 5;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.arc(shootingStar.x, shootingStar.y, shootingStar.headSize * 0.5, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    this.ctx.restore();
+                    
+                    // Fade out effect
+                    shootingStar.opacity -= 0.006;
+                    
+                    // Check if shooting star should be removed
+                    if (shootingStar.opacity <= 0 || 
+                        shootingStar.x > this.canvas.width + 100 || 
+                        shootingStar.y > this.canvas.height + 100) {
+                        this.currentShootingStar = null;
+                    }
+                }
+            }
+            animate() {
+                // Clear canvas
+                this.ctx.fillStyle = '#000000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                // Draw all effects
+                this.drawNebulae();
+                this.drawStars();
+                this.drawShootingStars();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        // Initialize the galaxy background when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            new GalaxyBackground();
+        });
+    </script>
+</body>
+</html> 
